@@ -30,18 +30,18 @@ class PeliculaController extends FOSRestController
             foreach($peliculas as $pelicula) {
 
                 //categoría
-                if ($pelicula->getCategoria()) {
-                    $categoria = array(
-                        'id'     => $pelicula->getCategoria()->getId(),
-                        'nombre' => $pelicula->getCategoria()->getNombre()
+                if ($pelicula->getCategorias()) {
+                    $categorias = array(
+                        'id'     => $pelicula->getCategorias()->getId(),
+                        'nombre' => $pelicula->getCategorias()->getNombre()
                     );
                 } else {
-                    $categoria = array();
+                    $categorias = array();
                 }
 
                 //actores
                 $actores = array();
-                foreach ($pelicula->getActors() as $actor) {
+                foreach ($pelicula->getActores() as $actor) {
                     $actores[] = array(
                         'id'             => $actor->getId(),
                         'nombre'         => $actor->getNombre(),
@@ -53,8 +53,9 @@ class PeliculaController extends FOSRestController
                 $output[] = array(
                     'id'          => $pelicula->getId(),
                     'nombre'      => $pelicula->getNombre(),
-                    'descripcion' => $pelicula->getDescripcion(),
-                    'categoria'   => $categoria,
+                    'resumen'     => $pelicula->getResumen(),
+                    'url_trailer' => $pelicula->getUrlTrailer(),
+                    'categoria'   => $categorias,
                     'actors'      => $actores,
                 );
             }
@@ -79,38 +80,40 @@ class PeliculaController extends FOSRestController
         // busca la película
         $pelicula = $repoPeliculas->find($id);
 
+
         if ($pelicula) {
 
-            //categoría
-            if ($pelicula->getCategoria()) {
-                $categoria = array(
-                    'id'     => $pelicula->getCategoria()->getId(),
-                    'nombre' => $pelicula->getCategoria()->getNombre()
-                );
-            } else {
-                $categoria = array();
-            }
+          //categoría
+          if ($pelicula->getCategorias()) {
+              $categorias = array(
+                  'id'     => $pelicula->getCategorias()->getId(),
+                  'nombre' => $pelicula->getCategorias()->getNombre()
+              );
+          } else {
+              $categorias = array();
+          }
 
-            //actores
-            $actores = array();
-            foreach ($pelicula->getActors() as $actor) {
-                $actores[] = array(
-                    'id'             => $actor->getId(),
-                    'nombre'         => $actor->getNombre(),
-                    'anioNacimiento' => $actor->getAnioNacimiento()
-                );
-            }
+          //actores
+          $actores = array();
+          foreach ($pelicula->getActores() as $actor) {
+              $actores[] = array(
+                  'id'             => $actor->getId(),
+                  'nombre'         => $actor->getNombre(),
+                  'anioNacimiento' => $actor->getAnioNacimiento()
+              );
+          }
 
-            //peliculas
-            $output = array(
-                'id'          => $pelicula->getId(),
-                'nombre'      => $pelicula->getNombre(),
-                'descripcion' => $pelicula->getDescripcion(),
-                'categoria'   => $categoria,
-                'actors'      => $actores,
-            );
+          //peliculas
+          $output[] = array(
+              'id'          => $pelicula->getId(),
+              'nombre'      => $pelicula->getNombre(),
+              'resumen'     => $pelicula->getResumen(),
+              'url_trailer' => $pelicula->getUrlTrailer(),
+              'categoria'   => $categorias,
+              'actors'      => $actores,
+          );
 
-            return new View($output, Response::HTTP_OK);
+          return new View($output, Response::HTTP_OK);
         } else {
             return new View('Película no encontrada', Response::HTTP_NOT_FOUND);
         }
@@ -126,12 +129,14 @@ class PeliculaController extends FOSRestController
 
         //parametros de la petición
         $nombre = $request->request->get('nombre');
-        $descripcion = $request->request->get('descripcion');
+        $resumen = $request->request->get('resumen');
+        $url_trailer = $request->request->get('url_trailer');
 
         // entidad
         $pelicula = new Pelicula();
         $pelicula->setNombre($nombre);
-        $pelicula->setDescripcion($descripcion);
+        $pelicula->setResumen($resumen);
+        $pelicula->setUrlTrailer($url_trailer);
 
         // persistencia
         try {
@@ -154,12 +159,14 @@ class PeliculaController extends FOSRestController
 
         //parametros de la petición
         $nombre = $request->request->get('nombre');
-        $descripcion = $request->request->get('descripcion');
+        $resumen = $request->request->get('resumen');
+        $url_trailer = $request->request->get('url_trailer');
 
         // entidad
         $pelicula = $repoPeliculas->find($id);
         $pelicula->setNombre($nombre);
-        $pelicula->setDescripcion($descripcion);
+        $pelicula->setResumen($resumen);
+        $pelicula->setUrlTrailer($url_trailer);
 
         // persistencia
         try {
